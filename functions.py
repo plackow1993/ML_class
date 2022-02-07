@@ -42,8 +42,7 @@ def misclassError(Att_dataframe):
 		probs.append(Class_counts[x]/Sum)
 
 	error = 1-max(probs)
-	# only if you want to see this
-	#print(error)
+	return error
 	
 
 #Entropy
@@ -60,25 +59,23 @@ def entropy(Att_dataframe):
 	
 
 	error = -sum(probs)
-	#print(error)
+	return error
 	
 
 #Gini index
 def Gini(Att_dataframe):
-        probs = []
-        Sum = 0
-        Class_counts = Att_dataframe.iloc[:,-1].value_counts()
+	probs = []
+	Sum = 0
+	Class_counts = Att_dataframe.iloc[:,-1].value_counts()
 
-        for x in list(range(0,len(Class_counts))):
-                Sum = Sum + Class_counts[x]
+	for x in list(range(0,len(Class_counts))):
+		Sum = Sum + Class_counts[x]
 
-        for x in list(range(0,len(Class_counts))):
-                probs.append((Class_counts[x]/Sum)**2)
+	for x in list(range(0,len(Class_counts))):
+		probs.append((Class_counts[x]/Sum)**2)
 
-
-        error = 1-sum(probs)
-        print(error)
-
+	error = 1-sum(probs)
+	return error
 
 Gini(practice)
 Gini(tennis)
