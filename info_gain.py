@@ -20,26 +20,37 @@ tennis = practice[(practice["split2"] == 'l')]
 #impurity given is to decide if info gain is done using entropy, missclass error
 #or gini index
 def infoGain(Att_dataframe,impurity):
+    #use functions to find impurity
     imp = 0
     if(impurity == "entropy"): imp = entropy(Att_dataframe)
-    elif(impurity == "miss"): imp = misclassError(Att_dataframe)
+    elif(impurity == "mis"): imp = misclassError(Att_dataframe)
     else: imp = Gini(Att_dataframe)
+    
+    #loop through all splits
     counter = len(Att_dataframe)*-1 + 1
+    #total sum of all items in all splits
     totalSum = 0
+    #holds the impurity of a split
     gainList = []
+    #loop thru all splits
     while(counter > -1):
+        #get single row
         Class_counts = Att_dataframe.iloc[:,counter].value_counts()
         gain = 0
         Sum = 0
+        #loop through, get sum of items in row
         for x in list(range(0,len(Class_counts))):
             Sum = Sum + Class_counts[x]
+        #keep track of total sum    
         totalSum += Sum
+        #do the math for impurity of split
         for x in list(range(0,len(Class_counts))):
             probs.append(Class_counts[x]/Sum * math.log(Class_counts[x]/Sum))
         counter += 1
         
         gainList.append([sum(gain)*-1,Sum])
     
+    #get total impurity of all splits
     totalImp = 0
     for x in gainList:
         totalImp += x[0] * x[1]/totalSum
@@ -50,9 +61,9 @@ def infoGain(Att_dataframe,impurity):
         
 print("IG from practice, with entropy:",infoGain(practice,"entropy"))
 print("IG from practice with gini:",infoGain(practice,"gini"))
-print("IG from practice with misclass:",infoGain(practice,"miss"))
+print("IG from practice with misclass:",infoGain(practice,"mis"))
 print("\nIG from tennis with entropy:",infoGain(tennis,"entropy"))
 print("IG from tennis with gini:",infoGain(tennis,"gini"))
-print("IG from tennis with misclass:",infoGain(tennis,"miss"))
+print("IG from tennis with misclass:",infoGain(tennis,"mis"))
    
     
