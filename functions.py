@@ -10,7 +10,7 @@ import math
 
 #creating a simple table of data for testing the functions (Mitchel example).
 
-tennis = {'Outlook':['s', 's', 'o', 'r', 'r', 'r', 'o', 's', 's', 'r', 's', 'o', 'o', 'r'], 'Temp':['h', 'h', 'h', 'm', 'c', 'c', 'c', 'm', 'c', 'm', 'm', 'm', 'h', 'm'] ,'Hum':['h', 'h', 'h', 'h', 'n', 'n', 'n', 'h', 'n', 'n', 'n', 'h', 'n', 'h'], 'Wind':['w', 's', 'w', 'w', 'w', 's', 's', 'w', 'w', 'w', 's', 's', 'w', 's'], 'PlayTennis':['n', 'm', 'y', 'y', 'y', 'n', 'y', 'n', 'y', 'y', 'y', 'y', 'y', 'n'] }
+tennis = {'Outlook':['s', 's', 'o', 'r', 'r', 'r', 'o', 's', 's', 'r', 's', 'o', 'o', 'r'], 'Temp':['h', 'h', 'h', 'm', 'c', 'c', 'c', 'm', 'c', 'm', 'm', 'm', 'h', 'm'] ,'Hum':['h', 'h', 'h', 'h', 'n', 'n', 'n', 'h', 'n', 'n', 'n', 'h', 'n', 'h'], 'Wind':['w', 's', 'w', 'w', 'w', 's', 's', 'w', 'w', 'w', 's', 's', 'w', 's'], 'PlayTennis':['n', 'n', 'y', 'y', 'y', 'n', 'y', 'n', 'y', 'y', 'y', 'y', 'y', 'n'] }
 
 #This is our example splits from class (2.1 lecture), used to check if the error functions are being coded correctly.
 
@@ -19,8 +19,8 @@ practice = {'split1':['l', 'l', 'l', 'r', 'l', 'r', 'r', 'r'], 'split2':['l','l'
 practice=pd.DataFrame(data=practice)
 tennis=pd.DataFrame(data=tennis)
 
-practice = practice[(practice["split1"] == 'l')]
-tennis = practice[(practice["split2"] == 'l')]
+#practice = practice[(practice["split1"] == 'l')]
+tennis = tennis[(tennis["Wind"] == 'w')]
 
 #finding the correct attribute table
 
@@ -47,19 +47,20 @@ def misclassError(Att_dataframe):
 
 #Entropy
 def entropy(Att_dataframe):
-	probs = []
-	Sum = 0
-	Class_counts = Att_dataframe.iloc[:,-1].value_counts()	
+    probs = []
+    checker = []
+    Sum = 0
+    Class_counts = Att_dataframe.iloc[:,-1].value_counts()
 
-	for x in list(range(0,len(Class_counts))):
-                Sum = Sum + Class_counts[x]
+    for x in list(range(0,len(Class_counts))):
+        Sum = Sum + Class_counts[x]
 
-	for x in list(range(0,len(Class_counts))):
-		probs.append(Class_counts[x]/Sum*math.log(Class_counts[x]/Sum,2)) 
-	
+    for x in list(range(0,len(Class_counts))):
+        probs.append((Class_counts[x]/Sum)*math.log(Class_counts[x]/Sum,2))
+        checker.append(math.log(Class_counts[x]/Sum,2))
 
-	error = -sum(probs)
-	return error
+    error = -sum(probs)
+    return error
 	
 
 #Gini index
@@ -77,5 +78,6 @@ def Gini(Att_dataframe):
 	error = 1-sum(probs)
 	return error
 
-Gini(practice)
-Gini(tennis)
+#print(Gini(practice))
+print(entropy(tennis))
+print(entropy(practice))

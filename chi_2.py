@@ -1,3 +1,4 @@
+
 #starting code for chi squared information. Should be implemented as a pruning measure within the main code.
 
 import pandas as pd
@@ -25,6 +26,7 @@ chi=pd.read_excel("Chi2_values.xlsx")
 alpha = 0.1
 attribute_name = 'Hum'
 class_name = 'PlayTennis'
+
 
 #make alphabetically sorted lists of the lables and the classes after a split this is to make sure the chi-squared counts align
 label_list = dataframe[attribute_name].unique()
