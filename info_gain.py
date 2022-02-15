@@ -12,58 +12,50 @@ practice = {'split1':['l', 'l', 'l', 'r', 'l', 'r', 'r', 'r'], 'split2':['l','l'
 practice=pd.DataFrame(data=practice)
 tennis=pd.DataFrame(data=tennis)
 
-practice = practice[(practice["split1"] == 'l')]
-tennis = practice[(practice["split2"] == 'l')]
-
 
 #information gain
 #impurity given is to decide if info gain is done using entropy, missclass error
 #or gini index
-def infoGain(Att_dataframe,impurity):
+def infoGain(Att_dataframe,impurity,feature,attributes):
     #use functions to find impurity
-    imp = 0
-    if(impurity == "entropy"): imp = entropy(Att_dataframe)
-    elif(impurity == "mis"): imp = misclassError(Att_dataframe)
-    else: imp = Gini(Att_dataframe)
-    
-    #loop through all splits
-    counter = len(Att_dataframe)*-1 + 1
-    #total sum of all items in all splits
+    targetImpurity = 0
+    if(impurity == "entropy"):
+        targetImpurity = entropy(Att_dataframe) 
+    elif(impurity == "mis"):
+        targetImpurity = misclassError(Att_dataframe)
+    else:
+        targetImpurity = Gini(Att_dataframe)
+        
+    imps = []
     totalSum = 0
-    #holds the impurity of a split
-    gainList = []
-    #loop thru all splits
-    while(counter > -1):
-        #get single row
-        Class_counts = Att_dataframe.iloc[:,counter].value_counts()
-        gain = 0
-        Sum = 0
-        #loop through, get sum of items in row
-        for x in list(range(0,len(Class_counts))):
-            Sum = Sum + Class_counts[x]
-        #keep track of total sum    
+    for x in attributes:
+        imp = 0
+        split = Att_dataframe[(Att_dataframe[feature] == x)]
+        Sum = sumSplit(split)
         totalSum += Sum
-        #do the math for impurity of split
-        for x in list(range(0,len(Class_counts))):
-            probs.append(Class_counts[x]/Sum * math.log(Class_counts[x]/Sum))
-        counter += 1
+        if(impurity == "entropy"):
+            imp = entropy(split) 
+        elif(impurity == "mis"):
+            imp = misclassError(split)
+        else:
+            imp = Gini(split)
+        imps.append([imp,Sum])
+    remainingImpurity = 0    
+    for x in imps:
+        remainingImpurity += x[0] * (x[1]/totalSum)
+    return targetImpurity - remainingImpurity     
+          
+def sumSplit(Att_dataframe):
+    probs = []
+    Sum = 0
+    Class_counts = Att_dataframe.iloc[:,-1].value_counts()
+
+    for x in list(range(0,len(Class_counts))):
+        Sum = Sum + Class_counts[x]
         
-        gainList.append([sum(gain)*-1,Sum])
-    
-    #get total impurity of all splits
-    totalImp = 0
-    for x in gainList:
-        totalImp += x[0] * x[1]/totalSum
-        
-        
-    return imp - totalImp
-    
-        
-print("IG from practice, with entropy:",infoGain(practice,"entropy"))
-print("IG from practice with gini:",infoGain(practice,"gini"))
-print("IG from practice with misclass:",infoGain(practice,"mis"))
-print("\nIG from tennis with entropy:",infoGain(tennis,"entropy"))
-print("IG from tennis with gini:",infoGain(tennis,"gini"))
-print("IG from tennis with misclass:",infoGain(tennis,"mis"))
-   
-    
+    return Sum
+
+
+
+print(infoGain(practice,"entropy","split1",['l','r']))
+print(infoGain(practice,"gini","split1",['l','r']))

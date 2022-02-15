@@ -79,5 +79,5 @@ def Gini(Att_dataframe):
 	return error
 
 #print(Gini(practice))
-print(entropy(tennis))
-print(entropy(practice))
+#print(entropy(tennis))
+#print(entropy(practice))
