@@ -19,7 +19,7 @@ practice = {'split1':['l', 'l', 'l', 'r', 'l', 'r', 'r', 'r'], 'split2':['l','l'
 practice=pd.DataFrame(data=practice)
 tennis=pd.DataFrame(data=tennis)
 
-#practice = practice[(practice["split1"] == 'l')]
+practice = practice[(practice["split2"] == 'r')]
 tennis = tennis[(tennis["Wind"] == 'w')]
 
 #finding the correct attribute table
@@ -31,18 +31,20 @@ tennis = tennis[(tennis["Wind"] == 'w')]
 
 #Misclassification error
 def misclassError(Att_dataframe):
-	probs = []
-	Sum = 0
-	Class_counts = Att_dataframe.iloc[:,-1].value_counts()
+    probs = []
+    Sum = 0
+    Class_counts = Att_dataframe.iloc[:,-1].value_counts()
+    if len(Class_counts) == 1:
+        error = 0
+    else:
+        for x in list(range(0,len(Class_counts))):
+            Sum = Sum + Class_counts[x]
 	
-	for x in list(range(0,len(Class_counts))):
-		Sum = Sum + Class_counts[x]
-	
-	for x in list(range(0,len(Class_counts))):
-		probs.append(Class_counts[x]/Sum)
+        for x in list(range(0,len(Class_counts))):
+            probs.append(Class_counts[x]/Sum)
 
-	error = 1-max(probs)
-	return error
+        error = 1-max(probs)
+    return error
 	
 
 #Entropy
@@ -51,33 +53,37 @@ def entropy(Att_dataframe):
     checker = []
     Sum = 0
     Class_counts = Att_dataframe.iloc[:,-1].value_counts()
+    if len(Class_counts) == 1:
+        error = 0
+    else:
+        for x in list(range(0,len(Class_counts))):
+            Sum = Sum + Class_counts[x]
 
-    for x in list(range(0,len(Class_counts))):
-        Sum = Sum + Class_counts[x]
+        for x in list(range(0,len(Class_counts))):
+            probs.append((Class_counts[x]/Sum)*math.log(Class_counts[x]/Sum,2))
+            checker.append(math.log(Class_counts[x]/Sum,2))
 
-    for x in list(range(0,len(Class_counts))):
-        probs.append((Class_counts[x]/Sum)*math.log(Class_counts[x]/Sum,2))
-        checker.append(math.log(Class_counts[x]/Sum,2))
-
-    error = -sum(probs)
+        error = -sum(probs)
     return error
 	
 
 #Gini index
 def Gini(Att_dataframe):
-	probs = []
-	Sum = 0
-	Class_counts = Att_dataframe.iloc[:,-1].value_counts()
+    probs = []
+    Sum = 0
+    Class_counts = Att_dataframe.iloc[:,-1].value_counts()
+    if len(Class_counts) == 1:
+        error = 0
+    else:
+        for x in list(range(0,len(Class_counts))):
+            Sum = Sum + Class_counts[x]
 
-	for x in list(range(0,len(Class_counts))):
-		Sum = Sum + Class_counts[x]
+        for x in list(range(0,len(Class_counts))):
+            probs.append((Class_counts[x]/Sum)**2)
 
-	for x in list(range(0,len(Class_counts))):
-		probs.append((Class_counts[x]/Sum)**2)
+        error = 1-sum(probs)
+    return error
 
-	error = 1-sum(probs)
-	return error
-
-#print(Gini(practice))
-#print(entropy(tennis))
 #print(entropy(practice))
+#print(Gini(practice))
+#print(misclassError(practice))
