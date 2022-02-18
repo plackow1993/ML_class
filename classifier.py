@@ -29,10 +29,6 @@ Att_dataframe = pd.DataFrame(list_of_string_lists, columns = column_names)
 Att_dataframe.insert(len(list_of_string_lists[1]), "Result", train_data['Col3'], True)
 
 
-
-#This is to confirm that chi_2 works. Can leave commented out.
-#print(chi_2(Att_dataframe, 0.05, "0", Att_dataframe.iloc[:,-1].name))
-
 #testing dataframes. Tennis from mitchell, practice from class.
 tennis = {'Outlook':['s', 's', 'o', 'r', 'r', 'r', 'o', 's', 's', 'r', 's', 'o', 'o', 'r'], 'Temp':['h', 'h', 'h', 'm', 'c', 'c', 'c', 'm', 'c', 'm', 'm', 'm', 'h', 'm'] ,'Hum':['h', 'h', 'h', 'h', 'n', 'n', 'n', 'h', 'n', 'n', 'n', 'h', 'n', 'h'], 'Wind':['w', 's', 'w', 'w', 'w', 's', 's', 'w', 'w', 'w', 's', 's', 'w', 's'], 'PlayTennis':['n', 'n', 'y', 'y', 'y', 'n', 'y', 'n', 'y', 'y', 'y', 'y', 'y', 'n'] }
 
@@ -65,6 +61,9 @@ split_choice = maxIG(Att_dataframe,"Gini")
 #can leave this in here to check on what we are keeping as the split. Can use split_choice to keep track of splits if we want to build a tree using the labels.
 print("split this node by attribute", split_choice)
 
+#tests chi_squared for the split choice. Can comment out the observed and expected dataframes in chi_2 function file. I keep it to check numbers for sanity.
+
+print(chi_2(Att_dataframe, 0.05, split_choice, Att_dataframe.iloc[:,-1].name))
 #make a set of sub dataframes set up by split chosen while removing the split column.
 for x in Att_dataframe[split_choice].unique():
     split_x = Att_dataframe[(Att_dataframe[split_choice] == x)]

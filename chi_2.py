@@ -17,8 +17,10 @@ practice = {'split1':['l', 'l', 'l', 'r', 'l', 'r', 'r', 'r'], 'split2':['l','l'
 Att_dataframe=pd.DataFrame(data=tennis)
 #These are our inputs to this chi-squared function. Alpha is the critical value. Alpha*100 = 1 - %confidence
 
-#Just check this
-print(Att_dataframe.iloc[:,-1].name)
+#This is to check the name of the dataframe made byt the following.
+#print(Att_dataframe.iloc[:,-1].name)
+
+
 def chi_2(Att_dataframe, alpha, attribute_name, class_name):
 
     if alpha == 1:
