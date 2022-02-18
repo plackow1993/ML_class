@@ -16,9 +16,12 @@ tennis = {'Outlook':['s', 's', 'o', 'r', 'r', 'r', 'o', 's', 's', 'r', 's', 'o',
 practice = {'split1':['l', 'l', 'l', 'r', 'l', 'r', 'r', 'r'], 'split2':['l','l', 'r', 'r', 'l', 'l', 'l', 'l'], 'C': [1,1,1,1,0,0,0,0] }
 Att_dataframe=pd.DataFrame(data=tennis)
 #These are our inputs to this chi-squared function. Alpha is the critical value. Alpha*100 = 1 - %confidence
+
+#Just check this
+print(Att_dataframe.iloc[:,-1].name)
 def chi_2(Att_dataframe, alpha, attribute_name, class_name):
 
-    if alpha == 0:
+    if alpha == 1:
         print('Chi is greater than the critical value so this test is a pass, keep the split (p<ALPHA)')
         result = "keep"
         
@@ -86,5 +89,5 @@ def chi_2(Att_dataframe, alpha, attribute_name, class_name):
 
     return result
     
-print(chi_2(Att_dataframe, 0.05, "Outlook", "PlayTennis"))
-print(chi_2(Att_dataframe, 0.00, "Outlook", "PlayTennis"))
+#print(chi_2(Att_dataframe, 0.05, "0", Att_dataframe.iloc[:,-1].name))
+#print(chi_2(Att_dataframe, 1, "Outlook", "PlayTennis"))
