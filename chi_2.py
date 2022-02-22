@@ -26,6 +26,8 @@ def chi_2(Att_dataframe, alpha, attribute_name, class_name):
     if alpha == 1:
         print('Chi is greater than the critical value so this test is a pass, keep the split (p<ALPHA)')
         result = "keep"
+        #indicator is a binary variable [keep split = 1, turn to leaf = 0]
+        indicator = 1
         
     else:
         #reads an already made excel file by Ken Plackowski using the INVCHI(DOF, Percentage) function. This can be updated if we realize that we need more degrees of freedom. I've left in the alpha=0.1 and 0.05, as these are the only two we need.
@@ -50,6 +52,7 @@ def chi_2(Att_dataframe, alpha, attribute_name, class_name):
 
         if deg_of_free == 0:
             print("split is pure, keep the split")
+            indicator = 1
         #this is the observed counts dataframe.
 
         else:
@@ -61,14 +64,14 @@ def chi_2(Att_dataframe, alpha, attribute_name, class_name):
             
             obs_frame.loc['Total'] = obs_frame.sum()
             obs_frame['Total'] = obs_frame.sum(axis=1)
-            print("observed data is", obs_frame)
+            #print("observed data is", obs_frame)
             
             #this is the expected counts dataframe
             exp_frame = pd.DataFrame()
             for x in label_list:
                 for y in class_list:
                     exp_frame.loc[x,y] = (obs_frame.loc['Total',y]*obs_frame.loc[x,'Total'])/obs_frame.loc['Total','Total']
-            print("expected data is", exp_frame)
+            #print("expected data is", exp_frame)
             
             #this is the chi squared statistic
             chi_2 = 0
@@ -85,11 +88,12 @@ def chi_2(Att_dataframe, alpha, attribute_name, class_name):
             if chi_2 > chi_crit:
                 print('Chi is greater than the critical value so this test is a pass, keep the split (p<ALPHA)')
                 result = "keep"
+                indicator = 1
             else:
                 print('Chi is less than the critical value so this test is a fail, stop splitting here (p>ALPHA)')
                 result = "stop"
-
-    return result
+                indicator = 0
+    return indicator
     
 #print(chi_2(Att_dataframe, 0.05, "0", Att_dataframe.iloc[:,-1].name))
 #print(chi_2(Att_dataframe, 1, "Outlook", "PlayTennis"))

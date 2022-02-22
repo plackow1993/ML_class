@@ -67,8 +67,8 @@ print(chi_2(Att_dataframe, 0.05, split_choice, Att_dataframe.iloc[:,-1].name))
 #make a set of sub dataframes set up by split chosen while removing the split column.
 for x in Att_dataframe[split_choice].unique():
     split_x = Att_dataframe[(Att_dataframe[split_choice] == x)]
-    #new_sub_frame = split_x.drop(split_choice, 1)
+    new_sub_frame = split_x.drop(columns = split_choice, axis = 1)
     #print("subframe for", x, "is")
-    #print(new_sub_frame)
+    print(new_sub_frame)
     print(str(x))
 

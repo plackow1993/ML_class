@@ -1,4 +1,4 @@
-
+#This will be for use of utilizing the tree from "ken's classifier", This takes in a vector with keys -29,...,0,...,30, and provides a result from the following options ['EI', IE', 'N']
 #Decision Tree Classifier.
 
 #load in packages and other team written functions. The team wrote infogain, functions, and chi_2. Math is imported for log, which could be taylor approximated by a polynomial to the nth degree if really necessary. Pprint for personal visualizing of the nested dict (pythons final tree structure). Time for code run time checking (this was primarily used for an idea of the effectiveness of chi_2. Random is explained in a comment below.
@@ -14,7 +14,7 @@ import time
 import random
 
 #Begin code testing time.
-start = time.time()
+start_time = time.time()
 
 #when pruning, using the random seed to get the same tree each time. At pruning step, the most prevalent class will be chosen, however, if there are more than 1 most common class, a random choice of a classifier will be made. This keeps that choice consistent on any machine.
 random.seed(9000)
@@ -25,7 +25,7 @@ chi=pd.read_excel("Chi2_values.xlsx")
 
 #loading in the training data
 train_data = pd.read_csv("train.csv", names = ['Col1', 'Col2', 'Col3'])
-
+test_data = pd.read_csv("test.csv", names = ['Col1', 'Col2'])
 #testing dataframes. Tennis from mitchell, practice from class. This will test our overall tree success. Smaller, so takes less time for troubleshooting.
 tennis = {'Outlook':['sunny', 'sunny', 'overcast', 'rainy', 'rainy', 'rainy', 'overcast', 'sunny', 'sunny', 'rainy', 'sunny', 'overcast', 'overcast', 'rainy'], 'Temp':['h', 'h', 'h', 'm', 'c', 'c', 'c', 'm', 'c', 'm', 'm', 'm', 'h', 'm'] ,'Hum':['h', 'h', 'h', 'h', 'n', 'n', 'n', 'h', 'n', 'n', 'n', 'h', 'n', 'h'], 'Wind':['w', 's', 'w', 'w', 'w', 's', 's', 'w', 'w', 'w', 's', 's', 'w', 's'], 'PlayTennis':['no', 'no', 'yes', 'yes', 'yes', 'no', 'yes', 'no', 'yes', 'yes', 'yes', 'yes', 'yes', 'no'] }
 
@@ -45,19 +45,38 @@ list_of_string_lists = []
 for x in list(range(0,train_data.shape[0])):
     list_of_string_lists.append(list(train_data.iat[x,1]))
 
+
 #This att_dataframe is now the required format to run our code. Each position number is a string from -30 to 29 and the final column is labeled as "Result"
 Att_dataframe = pd.DataFrame(list_of_string_lists, columns = column_names)
 
 #Final att_dataframe for use in our code (training att_dataframe)
 Att_dataframe.insert(len(list_of_string_lists[1]), "Result", train_data['Col3'], True)
-print(Att_dataframe.iloc[0,:])
+#print(Att_dataframe.iloc[0,:])
 #-----------
 
+#----------- Doing the same as above with the test data
+column_names = []
+#relabel the column with the 60 string DNA sequence as new labels -29 to 30. Assuming they are aligned at the middle of the sequence where the middle is the identifying factor, i would like the first split to register at 0. Checking this, it is true according to all three measures of uncertainty.
+for x in list(range(0,len(test_data.iat[1,1]))):
+    column_names.append(str(x-29))
 
-#Use these if we want to test out practice or tennis.
-#Att_dataframe=pd.DataFrame(data=practice)
-#Att_dataframe=pd.DataFrame(data=tennis)
+#this turns the train.csv data into a more organized dataframe separated by position of base. Ordered from the first position (-29) to the last position (30), centered at 0. The last column is titled RESULT. Which is our target attribute.
+TEST_dataframe = pd.DataFrame(columns = column_names)
+list_of_string_lists = []
+for x in list(range(0,test_data.shape[0])):
+    list_of_string_lists.append(list(test_data.iat[x,1]))
 
+
+#This att_dataframe is now the required format to run our code. Each position number is a string from -30 to 29 and the final column is labeled as "Result"
+TEST_dataframe = pd.DataFrame(list_of_string_lists, columns = column_names)
+
+print(TEST_dataframe.iloc[838:840])
+#Final att_dataframe for use in our code (training att_dataframe)
+#Att_dataframe.insert(len(list_of_string_lists[1]), "Result", train_data['Col3'], True)
+#print(Att_dataframe.iloc[0,:])
+#-----------
+
+##### We Can Run Everything Down Here using some hyperparameters to test many things at once.#########
 
 
 
@@ -81,12 +100,11 @@ def maxIG(Att_dataframe, impurity_measure):
     return max_IG_att, max(IG_values)
 
 
-split_choice = maxIG(Att_dataframe,"Gini")[0]
 
 
 class_list = Att_dataframe[Att_dataframe.iloc[:,-1].name].unique()
 class_list.sort()
-print("the classes are", class_list)
+
 #can leave this in here to check on what we are keeping as the split. Can use split_choice to keep track of splits if we want to build a tree using the labels.
 #print("split this node by attribute", split_choice)
 
@@ -94,21 +112,21 @@ print("the classes are", class_list)
 
 #print(chi_2(Att_dataframe, 1, split_choice, Att_dataframe.iloc[:,-1].name))
 #make a set of sub dataframes set up by split chosen while removing the split column.
-for x in Att_dataframe[split_choice].unique():
-    split_x = Att_dataframe[(Att_dataframe[split_choice] == x)]
-    new_sub_frame = split_x.drop(columns = split_choice, axis = 1)
+
+
+#variables inside:
+    #cutoff, use for pruning like chi_squared, or use =100 for no cutoff
+    #branch_counter, only useful for the size of the tree
+    #impurity = impurity measure of interest
+    #alpha: 1-%confidence for Chi squared.
     
-    if new_sub_frame.shape[0] == 1:
-        #print(new_sub_frame)
-        print("The class is", (new_sub_frame.iloc[0,-1]))
-        #print(new_sub_frame)
-        #print(str(x))
-
+cut_off = 12
 branch_counter = 0
-
+impurity = "entropy"
+alpha = 0.005
 #Basic idea of the tree node structure collection created with assistance from the buildTree function of https://medium.com/@lope.ai/decision-trees-from-scratch-using-id3-python-coding-it-up-6b79e3458de4
-#Our algorithm requires many revisions very different from the source above, but help with the recursion aspect was researched, so I wanted to give credit to a source for this. Some sources were checked but this source was referenced on correctness. You can see artifacts of the sourse in examples like if tree is...
-def Tree(Att_dataframe, impurity, branch_counter, tree = None):
+#Our algorithm requires many revisions very different from the source above, but help with the recursion aspect was researched, so I wanted to give credit to a source for this. Some sources were checked but this source was referenced on correctness. You can see artifacts of the sourse in examples like: if tree is...
+def Tree(Att_dataframe, impurity, branch_counter, cut_off, alpha, tree = None):
 
     target = Att_dataframe.iloc[:,-1].name
     node = maxIG(Att_dataframe,impurity)[0]
@@ -134,7 +152,7 @@ def Tree(Att_dataframe, impurity, branch_counter, tree = None):
             tree = Att_dataframe.iloc[:,-1].unique()[0]
             branch_counter = 0
             break            #print("this should stop")
-        elif chi_2(Att_dataframe, 1, node, Att_dataframe.iloc[:,-1].name) == 0 or branch_counter > 30:
+        elif chi_2(Att_dataframe, alpha, node, Att_dataframe.iloc[:,-1].name) == 0 or branch_counter > cut_off:
             #These three lines were put here to troubleshoot correct counts of each class at a stopping node.
             #print("number of IE=", len(Att_dataframe[(Att_dataframe[Att_dataframe.iloc[:,-1].name] == class_list[1])]))
             #print("number of EI=", len(Att_dataframe[(Att_dataframe[Att_dataframe.iloc[:,-1].name] == class_list[0])]))
@@ -155,25 +173,84 @@ def Tree(Att_dataframe, impurity, branch_counter, tree = None):
             break
         else:
             branch_counter += 1
-            print("branch counter is", branch_counter)
-            tree[node][x] = Tree(sub_frame, "Gini", branch_counter)
+            print("branch counter is", branch_counter, cut_off)
+            tree[node][x] = Tree(sub_frame, impurity, branch_counter, cut_off, alpha)
            
     return tree
     
-t=Tree(Att_dataframe, "Gini", branch_counter)
+t=Tree(Att_dataframe, impurity, branch_counter, cut_off, alpha)
 pprint.pprint(t)
 
-end = time.time()
-#def count_keys(dict_, counter=0):
-#    for each_key in dict_:
-#        if isinstance(dict_[each_key], dict):
-#            # Recursive call
-#            counter = count_keys(dict_[each_key], counter + 1)
-#        else:
-#            counter += 1
-#        print(each_key)
-#    return counter
 
 
-#print('The length of the nested dictionary is {}'.format(count_keys(t)))
-print("executable time", end-start)
+#this runs through the nested dictionary to check on all parts of an entry want this to take in a row of examples and try to guess the target. Was using this to get an idea of the structure of circumventing the list for help in understanding the prediction function below
+
+def print_keys(nested_dict):
+    for each_key in nested_dict:
+    
+        if nested_dict[each_key] in ['IE', 'EI', 'N']:
+            print("the value here is,", nested_dict[each_key])
+           
+        else:
+            new_dict = nested_dict[each_key]
+            pprint.pprint(new_dict)
+            print_keys(new_dict)
+    return
+    
+#print(A.at[0, '0'])
+
+#tree is the tree built from classifier, example is the set of examples to be predicted, and index_number is the row index in the dataframe of test samples. When we loop over index number, this will create a list of predictions.
+print("start indices here")
+Prediction_list = []
+prediction_pairs = [0,0]
+prediction_dataframe = pd.DataFrame(columns = ["Id", "Class"])
+
+print(prediction_dataframe)
+
+def prediction(tree, example, index_number):
+
+
+    #if the tree is one element, aka leaf, only need to return the value here, as this is our prediction.
+    if not isinstance(tree, dict):
+        return tree
+    else:
+        #This is to get the attribtute that will serve as this stage's parent node. The code will choose a new parent node based upon the values within the tree and the example to be predicted.
+        parent_node = next(iter(tree))
+        
+        #this is the value of that parent node at whatever the correct parent_node identifier is
+        value_at_node = example.at[index_number,parent_node]
+        
+        #We want to see if this value at the parent node is in the existing tree. There are or will be some spots that have only 3 or 4 base options (including N) and we want a no prediction if that is the case. If there is more of the dictionary to parse through, then we need to run through to the next parent node.
+        if value_at_node in tree[parent_node]:
+            return prediction(tree[parent_node][value_at_node], example, index_number)
+        else:
+            return 'N'
+
+
+for x in TEST_dataframe.index:
+    print(x)
+    prediction_pairs[0] = str(x+2001)
+    prediction_pairs[1] = prediction(t, TEST_dataframe, x)
+    prediction_dataframe.loc[x]=prediction_pairs
+
+print(prediction_dataframe)
+
+prediction_dataframe.to_csv('Entropy995testpredictioncutoff12withAssumption.csv', index=False)
+#This is only for testing our model with the training data, 1999/2000 matches with no stoppages
+#total_correct= 0
+#total_examples = 0
+#for x in Att_dataframe.index:
+#    total_examples += 1
+#    if prediction_dataframe.iloc[x,-1] == Att_dataframe.iloc[x,-1]:
+#        total_correct += 1
+#    else:
+#        print("not a match at position:", x)
+#        print("the prediction is", prediction_dataframe.iloc[x,-1])
+#print(total_examples)
+#print(total_correct)
+#print("the fraction of correct predictions is", total_correct/total_examples)
+
+#----- This is simply for cost purposes. time to run should be proportional to tree size, all else being equal.
+end_time = time.time()
+
+print("This took", end_time-start_time, "seconds")
