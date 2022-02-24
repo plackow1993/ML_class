@@ -9,17 +9,19 @@ tennis = {'Outlook':['s', 's', 'o', 'r', 'r', 'r', 'o', 's', 's', 'r', 's', 'o',
 
 practice = {'split1':['l', 'l', 'l', 'r', 'l', 'r', 'r', 'r'], 'splitb':['l','l', 'r', 'r', 'l', 'l', 'l', 'l'], 'C': ['1','1','1','1','0','0','0','0'] }
 
+#two dataframes to check on function's function
 practice=pd.DataFrame(data=practice)
-#print(practice)
-#for x in practice.columns:
-#    print(practice[x])
 tennis=pd.DataFrame(data=tennis)
-#practice = practice[(practice['splitb']=='r')]
-#tennis = tennis[(tennis['Outlook']=='s')]
-#print(tennis)
-#information gain
+
+
+#-----information gain
 #impurity given is to decide if info gain is done using entropy, missclass error
 #or gini index
+
+#att_dataframe is a pandas dataframe of our data with target attribute at -1
+#impurity is a string of entropy, mis (for misclass error), or Gini.
+#attributes are a list of values (all str) taken by the attribute (A, T, G, C, etc ...)
+#feature is the attribute name as a (str). For our genomic data, the values of 0, 1, 2, etc are all strings, not ints, by design.
 
 def infoGain(Att_dataframe,impurity,feature,attributes):
     #use functions to find impurity
@@ -69,7 +71,7 @@ def sumSplit(Att_dataframe):
     return Sum
 
 
-
+#checking as a standalone function
 #print(sumSplit(practice))
 #print(infoGain(tennis, "entropy", "Outlook", ['s','o', 'r']))
 #print(infoGain(practice, "entropy","splitb" ,['l','r']))

@@ -48,9 +48,13 @@ for x in list(range(0,train_data.shape[0])):
 
 #This att_dataframe is now the required format to run our code. Each position number is a string from -30 to 29 and the final column is labeled as "Result"
 Att_dataframe = pd.DataFrame(list_of_string_lists, columns = column_names)
+Att_dataframe = Att_dataframe.replace('N', 'G')
+
 
 #Final att_dataframe for use in our code (training att_dataframe)
 Att_dataframe.insert(len(list_of_string_lists[1]), "Result", train_data['Col3'], True)
+print(Att_dataframe)
+
 #print(Att_dataframe.iloc[0,:])
 #-----------
 
@@ -70,7 +74,7 @@ for x in list(range(0,test_data.shape[0])):
 #This att_dataframe is now the required format to run our code. Each position number is a string from -30 to 29 and the final column is labeled as "Result"
 TEST_dataframe = pd.DataFrame(list_of_string_lists, columns = column_names)
 
-print(TEST_dataframe.iloc[838:840])
+#print(TEST_dataframe.iloc[838:840])
 #Final att_dataframe for use in our code (training att_dataframe)
 #Att_dataframe.insert(len(list_of_string_lists[1]), "Result", train_data['Col3'], True)
 #print(Att_dataframe.iloc[0,:])
@@ -115,10 +119,10 @@ class_list.sort()
 
 
 #variables inside:
-    #cutoff, use for pruning like chi_squared, or use =100 for no cutoff
-    #branch_counter, only useful for the size of the tree
-    #impurity = impurity measure of interest
-    #alpha: 1-%confidence for Chi squared.
+    #cutoff int, use for pruning like chi_squared, or use =100 for no cutoff
+    #branch_counter int, only useful for the size of the tree
+    #impurity "str" (entropy, Gini, or mis)= impurity measure of interest
+    #alpha float (0.01, 1, 0.05, 0.005): 1-%confidence for Chi squared.
     
 cut_off = 12
 branch_counter = 0
@@ -126,6 +130,9 @@ impurity = "entropy"
 alpha = 0.005
 #Basic idea of the tree node structure collection created with assistance from the buildTree function of https://medium.com/@lope.ai/decision-trees-from-scratch-using-id3-python-coding-it-up-6b79e3458de4
 #Our algorithm requires many revisions very different from the source above, but help with the recursion aspect was researched, so I wanted to give credit to a source for this. Some sources were checked but this source was referenced on correctness. You can see artifacts of the sourse in examples like: if tree is...
+
+#Att_dataframe = pandas dataframe of training data
+#the rest are detailed at line 117
 def Tree(Att_dataframe, impurity, branch_counter, cut_off, alpha, tree = None):
 
     target = Att_dataframe.iloc[:,-1].name
@@ -224,6 +231,10 @@ def prediction(tree, example, index_number):
         if value_at_node in tree[parent_node]:
             return prediction(tree[parent_node][value_at_node], example, index_number)
         else:
+        #want to choose a value for class based upon training data distributions. Set seed back to 9000 to run code.
+            #random.seed(time.time())
+            #choice = random.choice(['N', 'N', 'IE', 'EI'])
+            #random.seed(9000)
             return 'N'
 
 
@@ -235,13 +246,14 @@ for x in TEST_dataframe.index:
 
 print(prediction_dataframe)
 
-prediction_dataframe.to_csv('Entropy995testpredictioncutoff12withAssumption.csv', index=False)
-#This is only for testing our model with the training data, 1999/2000 matches with no stoppages
+prediction_dataframe.to_csv('entropy995testpredictioncutoff12withNasGAssumption.csv', index=False)
+#This is only for validation of our model with the training data, 1999/2000 matches with no stoppages
 #total_correct= 0
 #total_examples = 0
-#for x in Att_dataframe.index:
+#new_df =
+#for x in new_df.index:
 #    total_examples += 1
-#    if prediction_dataframe.iloc[x,-1] == Att_dataframe.iloc[x,-1]:
+#    if prediction_dataframe.iloc[x,-1] == new_df.iloc[x,-1]:
 #        total_correct += 1
 #    else:
 #        print("not a match at position:", x)

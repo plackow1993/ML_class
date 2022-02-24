@@ -15,10 +15,12 @@ tennis = {'Outlook':['s', 's', 'o', 'r', 'r', 'r', 'o', 's', 's', 'r', 's', 'o',
 
 practice = {'split1':['l', 'l', 'l', 'r', 'l', 'r', 'r', 'r'], 'split2':['l','l', 'r', 'r', 'l', 'l', 'l', 'l'], 'C': [1,1,1,1,0,0,0,0] }
 Att_dataframe=pd.DataFrame(data=tennis)
-#These are our inputs to this chi-squared function. Alpha is the critical value. Alpha*100 = 1 - %confidence
+#------These are our inputs to this chi-squared function.
 
-#This is to check the name of the dataframe made byt the following.
-#print(Att_dataframe.iloc[:,-1].name)
+#Alpha (float) is the critical value. Alpha*100 = 1 - %confidence
+#Att_dataframe (pandas dataframe) is the set of Examples with attributes
+#attribute_name (str) is the name of the attribute node to check for split stopping
+#class_name (str) is the name of the class attribute label.
 
 
 def chi_2(Att_dataframe, alpha, attribute_name, class_name):
@@ -42,7 +44,7 @@ def chi_2(Att_dataframe, alpha, attribute_name, class_name):
 
 
 
-        #degrees of freedom Just count the number of class elements and labels for the specific attribute you are checking.
+        #degrees of freedom: Just count the number of class elements and labels for the specific attribute you are checking.
 
         label_count = Att_dataframe[attribute_name].nunique()
         class_count = Att_dataframe[class_name].nunique()
@@ -56,6 +58,9 @@ def chi_2(Att_dataframe, alpha, attribute_name, class_name):
         #this is the observed counts dataframe.
 
         else:
+        #obs = observed
+        #exp = expected
+        #chi^2 = sum (obs-exp)^2/exp
             obs_frame = pd.DataFrame()
             for x in label_list:
                 att_split = Att_dataframe[(Att_dataframe[attribute_name]==x)]
@@ -85,15 +90,17 @@ def chi_2(Att_dataframe, alpha, attribute_name, class_name):
             chi_crit = chi.loc[deg_of_free-1, alpha]
             print('critical value is', chi_crit)
             
+            #this was mainly for result checking, but more importantly, the indicator gets set to its keep or stop limit.
             if chi_2 > chi_crit:
-                print('Chi is greater than the critical value so this test is a pass, keep the split (p<ALPHA)')
+                #print('Chi is greater than the critical value so this test is a pass, keep the split (p<ALPHA)')
                 result = "keep"
                 indicator = 1
             else:
-                print('Chi is less than the critical value so this test is a fail, stop splitting here (p>ALPHA)')
+                #print('Chi is less than the critical value so this test is a fail, stop splitting here (p>ALPHA)')
                 result = "stop"
                 indicator = 0
     return indicator
     
+#testing the function as a standalone
 #print(chi_2(Att_dataframe, 0.05, "0", Att_dataframe.iloc[:,-1].name))
 #print(chi_2(Att_dataframe, 1, "Outlook", "PlayTennis"))

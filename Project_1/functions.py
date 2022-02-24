@@ -30,6 +30,7 @@ tennis = tennis[(tennis["Wind"] == 'w')]
 #I have it is a DF with (attributes,target). Here, we can restrict to reduction of the matrix by feature of interest, and the last column will contain those values needed for any error function.
 
 #Misclassification error
+#quick note, if there is only one class in an attribute, than that attribute has an impurity of zero. Thus the if statement with error set to zero for the class_counts being only one class.
 def misclassError(Att_dataframe):
     probs = []
     Sum = 0
