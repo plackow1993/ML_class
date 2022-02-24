@@ -246,7 +246,7 @@ for x in TEST_dataframe.index:
 
 print(prediction_dataframe)
 
-prediction_dataframe.to_csv('entropy995testpredictioncutoff12withNasGAssumption.csv', index=False)
+#prediction_dataframe.to_csv('entropy995testpredictioncutoff12withNasGAssumption.csv', index=False)
 #This is only for validation of our model with the training data, 1999/2000 matches with no stoppages
 #total_correct= 0
 #total_examples = 0
