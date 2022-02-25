@@ -46,7 +46,7 @@ for x in list(range(0,train_data.shape[0])):
     list_of_string_lists.append(list(train_data.iat[x,1]))
 
 
-#This att_dataframe is now the required format to run our code. Each position number is a string from -30 to 29 and the final column is labeled as "Result"
+#This att_dataframe is now the required format to run our code. Each position number is a string from -30 to 29 and the final column is labeled as "Result" We can use replace to change all N's to any base we like. I tried this at random and this did not improve our algorithm on the test data.
 Att_dataframe = pd.DataFrame(list_of_string_lists, columns = column_names)
 Att_dataframe = Att_dataframe.replace('N', 'G')
 
@@ -109,22 +109,15 @@ def maxIG(Att_dataframe, impurity_measure):
 class_list = Att_dataframe[Att_dataframe.iloc[:,-1].name].unique()
 class_list.sort()
 
-#can leave this in here to check on what we are keeping as the split. Can use split_choice to keep track of splits if we want to build a tree using the labels.
-#print("split this node by attribute", split_choice)
-
-#tests chi_squared for the split choice. Can comment out the observed and expected dataframes in chi_2 function file. I keep it to check numbers for sanity.
-
-#print(chi_2(Att_dataframe, 1, split_choice, Att_dataframe.iloc[:,-1].name))
-#make a set of sub dataframes set up by split chosen while removing the split column.
 
 
 #variables inside:
     #cutoff int, use for pruning like chi_squared, or use =100 for no cutoff
-    #branch_counter int, only useful for the size of the tree
+    #branch_counter int, only useful for checking accuracy of cut-off in the algorithm
     #impurity "str" (entropy, Gini, or mis)= impurity measure of interest
     #alpha float (0.01, 1, 0.05, 0.005): 1-%confidence for Chi squared.
     
-cut_off = 12
+cut_off = 8
 branch_counter = 0
 impurity = "entropy"
 alpha = 0.005
@@ -164,18 +157,22 @@ def Tree(Att_dataframe, impurity, branch_counter, cut_off, alpha, tree = None):
             #print("number of IE=", len(Att_dataframe[(Att_dataframe[Att_dataframe.iloc[:,-1].name] == class_list[1])]))
             #print("number of EI=", len(Att_dataframe[(Att_dataframe[Att_dataframe.iloc[:,-1].name] == class_list[0])]))
             #print("number of N=", len(Att_dataframe[(Att_dataframe[Att_dataframe.iloc[:,-1].name] == class_list[2])]))
+            n_len = len(Att_dataframe[(Att_dataframe['Result']=='N')][node])
+            i_len = len(Att_dataframe[(Att_dataframe['Result']=='IE')][node])
+            e_len = len(Att_dataframe[(Att_dataframe['Result']=='EI')][node])
+        
+            
             class_column_names = []
-            class_column_counts = []
+            class_column_counts = [e_len, i_len, n_len]
             max_options = []
             for z in class_list:
                 class_column_names.append(z)
-                class_column_counts.append(len(Att_dataframe[(Att_dataframe[Att_dataframe.iloc[:,-1].name] == z)]))
             print(class_column_names)
             print(class_column_counts)
             for z in range(0, len(class_list)):
                 if class_column_counts[z] == max(class_column_counts):
                     max_options.append(class_column_names[z])
-            tree = random.choice(max_options)
+            tree[node] = random.choice(max_options)
             branch_counter = 0
             break
         else:
@@ -214,6 +211,7 @@ prediction_dataframe = pd.DataFrame(columns = ["Id", "Class"])
 
 print(prediction_dataframe)
 
+
 def prediction(tree, example, index_number):
 
 
@@ -246,11 +244,11 @@ for x in TEST_dataframe.index:
 
 print(prediction_dataframe)
 
-#prediction_dataframe.to_csv('entropy995testpredictioncutoff12withNasGAssumption.csv', index=False)
+prediction_dataframe.to_csv('entropy995testpredictioncutoff5withNasGAssumption.csv', index=False)
 #This is only for validation of our model with the training data, 1999/2000 matches with no stoppages
 #total_correct= 0
 #total_examples = 0
-#new_df =
+#new_df = []
 #for x in new_df.index:
 #    total_examples += 1
 #    if prediction_dataframe.iloc[x,-1] == new_df.iloc[x,-1]:
@@ -262,7 +260,7 @@ print(prediction_dataframe)
 #print(total_correct)
 #print("the fraction of correct predictions is", total_correct/total_examples)
 
-#----- This is simply for cost purposes. time to run should be proportional to tree size, all else being equal.
+#----- This is simply for cost purposes. time to run should be proportional to tree size, all else being equal. Used this in the beginning to have an idea of success of pruning.
 end_time = time.time()
 
 print("This took", end_time-start_time, "seconds")
