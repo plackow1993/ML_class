@@ -53,9 +53,7 @@ Att_dataframe = Att_dataframe.replace('N', 'G')
 
 #Final att_dataframe for use in our code (training att_dataframe)
 Att_dataframe.insert(len(list_of_string_lists[1]), "Result", train_data['Col3'], True)
-print(Att_dataframe)
 
-#print(Att_dataframe.iloc[0,:])
 #-----------
 
 #----------- Doing the same as above with the test data
@@ -74,10 +72,7 @@ for x in list(range(0,test_data.shape[0])):
 #This att_dataframe is now the required format to run our code. Each position number is a string from -30 to 29 and the final column is labeled as "Result"
 TEST_dataframe = pd.DataFrame(list_of_string_lists, columns = column_names)
 
-#print(TEST_dataframe.iloc[838:840])
-#Final att_dataframe for use in our code (training att_dataframe)
-#Att_dataframe.insert(len(list_of_string_lists[1]), "Result", train_data['Col3'], True)
-#print(Att_dataframe.iloc[0,:])
+
 #-----------
 
 ##### We Can Run Everything Down Here using some hyperparameters to test many things at once.#########
@@ -96,9 +91,6 @@ def maxIG(Att_dataframe, impurity_measure):
         if len(IG_values) < Att_dataframe.shape[1]-1:
             IG_values.append(infoGain(Att_dataframe, impurity_measure, x, Att_dataframe[x].unique()))
             name_values.append(x)
-    
-    #print("the name of the attribute values are", name_values)
-    #print("ig values are", IG_values)
     max_IG_att = name_values[IG_values.index(max(IG_values))]
     #Finally, choose the attribute to split by and separate into subsets of split
     return max_IG_att, max(IG_values)
@@ -125,7 +117,7 @@ alpha = 0.005
 #Our algorithm requires many revisions very different from the source above, but help with the recursion aspect was researched, so I wanted to give credit to a source for this. Some sources were checked but this source was referenced on correctness. You can see artifacts of the sourse in examples like: if tree is...
 
 #Att_dataframe = pandas dataframe of training data
-#the rest are detailed at line 117
+#the rest are detailed at line 112
 def Tree(Att_dataframe, impurity, branch_counter, cut_off, alpha, tree = None):
 
     target = Att_dataframe.iloc[:,-1].name
@@ -153,10 +145,7 @@ def Tree(Att_dataframe, impurity, branch_counter, cut_off, alpha, tree = None):
             branch_counter = 0
             break            #print("this should stop")
         elif chi_2(Att_dataframe, alpha, node, Att_dataframe.iloc[:,-1].name) == 0 or branch_counter > cut_off:
-            #These three lines were put here to troubleshoot correct counts of each class at a stopping node.
-            #print("number of IE=", len(Att_dataframe[(Att_dataframe[Att_dataframe.iloc[:,-1].name] == class_list[1])]))
-            #print("number of EI=", len(Att_dataframe[(Att_dataframe[Att_dataframe.iloc[:,-1].name] == class_list[0])]))
-            #print("number of N=", len(Att_dataframe[(Att_dataframe[Att_dataframe.iloc[:,-1].name] == class_list[2])]))
+            
             n_len = len(Att_dataframe[(Att_dataframe['Result']=='N')][node])
             i_len = len(Att_dataframe[(Att_dataframe['Result']=='IE')][node])
             e_len = len(Att_dataframe[(Att_dataframe['Result']=='EI')][node])
@@ -201,15 +190,13 @@ def print_keys(nested_dict):
             print_keys(new_dict)
     return
     
-#print(A.at[0, '0'])
+
 
 #tree is the tree built from classifier, example is the set of examples to be predicted, and index_number is the row index in the dataframe of test samples. When we loop over index number, this will create a list of predictions.
-print("start indices here")
 Prediction_list = []
 prediction_pairs = [0,0]
 prediction_dataframe = pd.DataFrame(columns = ["Id", "Class"])
 
-print(prediction_dataframe)
 
 
 def prediction(tree, example, index_number):
@@ -230,14 +217,13 @@ def prediction(tree, example, index_number):
             return prediction(tree[parent_node][value_at_node], example, index_number)
         else:
         #want to choose a value for class based upon training data distributions. Set seed back to 9000 to run code.
-            #random.seed(time.time())
-            #choice = random.choice(['N', 'N', 'IE', 'EI'])
-            #random.seed(9000)
-            return 'N'
+            random.seed(time.time())
+            choice = random.choice(['N', 'N', 'IE', 'EI'])
+            random.seed(9000)
+            return choice
 
 
 for x in TEST_dataframe.index:
-    print(x)
     prediction_pairs[0] = str(x+2001)
     prediction_pairs[1] = prediction(t, TEST_dataframe, x)
     prediction_dataframe.loc[x]=prediction_pairs
